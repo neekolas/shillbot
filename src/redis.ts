@@ -25,8 +25,8 @@ export async function buildRedis() {
       groupId: string,
       inboxId: string,
       amount: number
-    ): Promise<void> {
-      await client.hIncrBy(buildScoreKey(groupId), inboxId, amount)
+    ): Promise<number> {
+      return client.hIncrBy(buildScoreKey(groupId), inboxId, amount)
     },
   }
 }

@@ -1,10 +1,14 @@
 import config from './config.js'
+import { handleMessage } from './handler.js'
 import { buildRedis } from './redis.js'
 import { buildClient } from './utils.js'
 
 async function main() {
   const client = await buildClient(config.wallet)
-  const _redis = await buildRedis()
+  const redis = await buildRedis()
+
+  console.log(`Listening to inbox: ${client.inboxId}`)
+  await client.conversations.sync()
 
   client.conversations.stream((error, convo) => {
     if (error) {
@@ -19,7 +23,7 @@ async function main() {
       console.warn(`Stream error: ${error}`)
       return
     }
-    console.log(message.id)
+    handleMessage(client, redis, message)
   })
 }
 

@@ -23,7 +23,11 @@ async function main() {
       console.warn(`Stream error: ${error}`)
       return
     }
-    handleMessage(client, redis, message)
+    try {
+      handleMessage(client, redis, message)
+    } catch (e) {
+      console.error('Error handling message', e)
+    }
   })
 }
 

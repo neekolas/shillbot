@@ -131,3 +131,4 @@ dist
 *.db3
 *.db3-shm
 *.db3-wal
+.DS_STORE

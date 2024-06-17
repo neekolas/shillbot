@@ -1,3 +1,4 @@
+import os from 'os'
 import { Client } from '@xmtp/mls-client'
 import { createWalletClient, http, toBytes, type WalletClient } from 'viem'
 import {
@@ -31,12 +32,19 @@ export async function randomClient(): Promise<Client> {
   return buildClient(wallet)
 }
 
+function buildDbPath(walletAddress: string, env: string): string {
+  return `${os.tmpdir()}/${env}-${walletAddress}.db3`
+}
+
 export async function buildClient(wallet: WalletClient): Promise<Client> {
   const address = wallet.account?.address
   if (!address || !wallet.account) {
     throw new Error('Missing address')
   }
-  const client = await Client.create(address, { env: 'dev' })
+  // TODO: don't use tempdir in production
+  const dbPath = buildDbPath(address, 'dev')
+  console.log(`Creating client with DB at ${dbPath}`)
+  const client = await Client.create(address, { env: 'dev', dbPath })
   if (!client.isRegistered && client.signatureText) {
     const signature = await wallet.signMessage({
       account: wallet.account,

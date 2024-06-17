@@ -2,6 +2,18 @@ import type { Client, DecodedMessage } from '@xmtp/mls-client'
 import type { RedisClient } from './redis.js'
 import { getSpamScore } from './spamScore.js'
 
+export async function evictMember(
+  client: Client,
+  groupId: string,
+  memberInboxId: string
+): Promise<void> {
+  const group = client.conversations.get(groupId)
+  if (!group) {
+    throw new Error('Group not found')
+  }
+  await group.removeMembersByInboxId([memberInboxId])
+}
+
 export async function handleMessage(
   _client: Client,
   redis: RedisClient,

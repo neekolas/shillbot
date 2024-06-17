@@ -8,6 +8,7 @@
     "build": "tsc",
     "dev": "tsx watch ./src/index.ts",
     "start": "tsx ./src/index.ts",
+    "spam": "tsx ./src/spammer.ts",
     "test": "vitest ."
   },
   "author": "",
@@ -15,6 +16,7 @@
   "packageManager": "yarn@4.1.0",
   "dependencies": {
     "@types/redis": "^4.0.11",
+    "@xmtp/content-type-text": "^1.0.0",
     "@xmtp/mls-client": "^0.0.10",
     "dotenv": "^16.4.5",
     "redis": "^4.6.14",

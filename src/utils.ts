@@ -1,6 +1,10 @@
 import { Client } from '@xmtp/mls-client'
 import { createWalletClient, http, toBytes, type WalletClient } from 'viem'
-import { mnemonicToAccount } from 'viem/accounts'
+import {
+  generatePrivateKey,
+  mnemonicToAccount,
+  privateKeyToAccount,
+} from 'viem/accounts'
 import { mainnet } from 'viem/chains'
 
 export function walletClientFromMnemonic(mnemonic: string): WalletClient {
@@ -10,6 +14,21 @@ export function walletClientFromMnemonic(mnemonic: string): WalletClient {
     chain: mainnet,
     transport: http(),
   })
+}
+
+export function randomWallet(): WalletClient {
+  const pk = generatePrivateKey()
+
+  return createWalletClient({
+    account: privateKeyToAccount(pk),
+    chain: mainnet,
+    transport: http(),
+  })
+}
+
+export async function randomClient(): Promise<Client> {
+  const wallet = randomWallet()
+  return buildClient(wallet)
 }
 
 export async function buildClient(wallet: WalletClient): Promise<Client> {

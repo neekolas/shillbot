@@ -1,5 +1,5 @@
 import config from './config.js'
-import { handleMessage } from './handler.js'
+import { handleMessage, handleNewGroup } from './handler.js'
 import { buildRedis } from './redis.js'
 import { buildClient } from './utils.js'
 
@@ -15,7 +15,7 @@ async function main() {
       console.error('Error streaming group', error)
       return
     }
-    console.log(`New conversation: ${convo.id}`)
+    handleNewGroup(client, convo)
   })
 
   client.conversations.streamAllMessages((error, message) => {

@@ -1,4 +1,4 @@
-import type { Client, DecodedMessage } from '@xmtp/mls-client'
+import type { Client, Conversation, DecodedMessage } from '@xmtp/mls-client'
 import type { RedisClient } from './redis.js'
 import { getSpamScore } from './spamScore.js'
 
@@ -15,7 +15,7 @@ export async function evictMember(
 }
 
 export async function handleMessage(
-  _client: Client,
+  client: Client,
   redis: RedisClient,
   message: DecodedMessage
 ) {
@@ -33,5 +33,10 @@ export async function handleMessage(
     console.log(
       `User ${message.senderInboxId} has a spam score of ${userScore}. Kicking them out of the group`
     )
+    evictMember(client, message.conversationId, message.senderInboxId)
   }
+}
+
+export async function handleNewGroup(client: Client, group: Conversation) {
+  console.log(`Joined a new conversation. ${group.id}`)
 }

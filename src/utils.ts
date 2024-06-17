@@ -1,4 +1,3 @@
-import os from 'os'
 import { Client } from '@xmtp/mls-client'
 import { createWalletClient, http, toBytes, type WalletClient } from 'viem'
 import {
@@ -7,6 +6,7 @@ import {
   privateKeyToAccount,
 } from 'viem/accounts'
 import { mainnet } from 'viem/chains'
+import config from './config.js'
 
 export function walletClientFromMnemonic(mnemonic: string): WalletClient {
   const account = mnemonicToAccount(mnemonic)
@@ -33,7 +33,7 @@ export async function randomClient(): Promise<Client> {
 }
 
 function buildDbPath(walletAddress: string, env: string): string {
-  return `${os.tmpdir()}/${env}-${walletAddress}.db3`
+  return `${config.dbFolder}/${env}-${walletAddress}.db3`
 }
 
 export async function buildClient(wallet: WalletClient): Promise<Client> {
@@ -41,10 +41,11 @@ export async function buildClient(wallet: WalletClient): Promise<Client> {
   if (!address || !wallet.account) {
     throw new Error('Missing address')
   }
+  const env = config.xmtpEnv
   // TODO: don't use tempdir in production
-  const dbPath = buildDbPath(address, 'dev')
+  const dbPath = buildDbPath(address, env)
   console.log(`Creating client with DB at ${dbPath}`)
-  const client = await Client.create(address, { env: 'dev', dbPath })
+  const client = await Client.create(address, { env, dbPath })
   if (!client.isRegistered && client.signatureText) {
     const signature = await wallet.signMessage({
       account: wallet.account,

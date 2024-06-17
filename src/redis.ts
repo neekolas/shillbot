@@ -30,3 +30,5 @@ export async function buildRedis() {
     },
   }
 }
+
+export type RedisClient = Awaited<ReturnType<typeof buildRedis>>

@@ -6,6 +6,9 @@ const buildScoreKey = (groupId: string) => `scores:${groupId}`
 const buildEvictionKey = (groupId: string, inboxId: string) =>
   `evictions:${groupId}:${inboxId}`
 
+const buildIsEvictedKey = (groupId: string, inboxId: string) =>
+  `isEvicted:${groupId}:${inboxId}`
+
 export type EvictionData = {
   messageFlagged: string
   accountAddressOrEns: string
@@ -57,6 +60,16 @@ export async function buildRedis() {
       }
 
       return data as EvictionData
+    },
+
+    async storeIsEvicted(groupId: string, inboxId: string) {
+      const key = buildIsEvictedKey(groupId, inboxId)
+      await client.set(key, 1)
+    },
+
+    async getIsEvicted(groupId: string, inboxId: string): Promise<boolean> {
+      const val = await client.exists(buildIsEvictedKey(groupId, inboxId))
+      return val !== 0
     },
   }
 }

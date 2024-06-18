@@ -8,13 +8,15 @@ import { findMemberAddresses, getConverseProfile } from './utils.js'
 export async function evictMember(
   client: Client,
   groupId: string,
-  memberInboxId: string
+  memberInboxId: string,
+  redis: RedisClient
 ): Promise<void> {
   const group = client.conversations.get(groupId)
   if (!group) {
     throw new Error('Group not found')
   }
   await group.removeMembersByInboxId([memberInboxId])
+  await redis.storeIsEvicted(groupId, memberInboxId)
 }
 
 async function tryResolveAddress(address: string): Promise<string> {

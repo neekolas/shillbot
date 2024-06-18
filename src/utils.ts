@@ -42,7 +42,6 @@ export async function buildClient(wallet: WalletClient): Promise<Client> {
     throw new Error('Missing address')
   }
   const env = config.xmtpEnv
-  // TODO: don't use tempdir in production
   const dbPath = buildDbPath(address, env)
   console.log(`Creating client with DB at ${dbPath}`)
   const client = await Client.create(address, { env, dbPath })

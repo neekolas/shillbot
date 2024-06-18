@@ -63,6 +63,10 @@ export async function handleMessage(
   redis: RedisClient,
   message: DecodedMessage
 ) {
+  if (message.senderInboxId === client.inboxId) {
+    console.log('Skipping message sent by bot')
+    return
+  }
   const messageScore = await getSpamScore(message)
   const userScore = await redis.incrementScore(
     message.conversationId,

@@ -65,8 +65,7 @@ export async function createFrameServer(
         memberId as string
       )
     }
-    const memberDisplayName = evictionData.accountAddressOrEns
-    const groupName = 'Group Name'
+    const { accountAddressOrEns: memberDisplayName, groupName } = evictionData
     const choice = inputText || buttonValue
 
     // XMTP verified address
@@ -81,6 +80,15 @@ export async function createFrameServer(
       typeof memberId === 'string'
     ) {
       evictMember(xmtpClient, groupId, memberId, redis)
+    }
+
+    let intents = [
+      ...choices.map((choice) => <Button value={choice}>{choice}</Button>),
+      status === 'response' && <Button.Reset>Reset</Button.Reset>,
+    ]
+
+    if (isEvicted) {
+      intents = [<Button.Reset>Ok</Button.Reset>]
     }
 
     return c.res({
@@ -112,6 +120,7 @@ export async function createFrameServer(
               marginTop: 30,
               padding: '0 120px',
               whiteSpace: 'pre-wrap',
+              display: 'flex',
             }}
           >
             {isEvicted &&
@@ -125,14 +134,13 @@ export async function createFrameServer(
               status === 'response' &&
               choice === 'Keep' &&
               `You've choosen to keep ${memberDisplayName} from ${groupName}`}
-            {!isEvicted && status !== `Evict ${memberId} from ${groupId}?`}
+            {!isEvicted &&
+              status === 'response' &&
+              `Evict ${memberId} from ${groupId}?`}
           </div>
         </div>
       ),
-      intents: [
-        ...choices.map((choice) => <Button value={choice}>{choice}</Button>),
-        status === 'response' && <Button.Reset>Reset</Button.Reset>,
-      ],
+      intents,
     })
   })
 

@@ -12,6 +12,7 @@ const buildIsEvictedKey = (groupId: string, inboxId: string) =>
 export type EvictionData = {
   messageFlagged: string
   accountAddressOrEns: string
+  groupName: string
   reason?: string
 }
 

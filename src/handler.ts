@@ -53,6 +53,7 @@ export async function beginEviction(
   redis.storeEvictionInfo(groupId, memberInboxId, {
     messageFlagged: messageFlagged.content,
     accountAddressOrEns: await tryResolveAddress(primaryMember),
+    groupName: group.name || groupId,
   })
 
   const evictionMessage = `User is flagged for eviction from group: ${config.frameUrlRoot}/evict?groupId=${groupId}&memberId=${memberInboxId}`

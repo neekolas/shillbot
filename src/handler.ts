@@ -26,7 +26,7 @@ export async function handleMessage(
   const userScore = await redis.incrementScore(
     message.conversationId,
     message.senderInboxId,
-    messageScore
+    messageScore.score
   )
 
   if (userScore < -10) {

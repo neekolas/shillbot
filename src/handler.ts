@@ -11,6 +11,7 @@ export async function evictMember(
   memberInboxId: string,
   redis: RedisClient
 ): Promise<void> {
+  client.conversations.list()
   const group = client.conversations.get(groupId)
   if (!group) {
     throw new Error('Group not found')

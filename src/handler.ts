@@ -1,6 +1,9 @@
+import { ContentTypeText } from '@xmtp/content-type-text'
 import type { Client, Conversation, DecodedMessage } from '@xmtp/mls-client'
+import config from './config.js'
 import type { RedisClient } from './redis.js'
 import { getSpamScore } from './spamScore.js'
+import { findMemberAddresses } from './utils.js'
 
 export async function evictMember(
   client: Client,
@@ -12,6 +15,35 @@ export async function evictMember(
     throw new Error('Group not found')
   }
   await group.removeMembersByInboxId([memberInboxId])
+}
+
+export async function beginEviction(
+  client: Client,
+  redis: RedisClient,
+  messageFlagged: DecodedMessage
+) {
+  const groupId = messageFlagged.conversationId
+  const memberInboxId = messageFlagged.senderInboxId
+
+  const group = client.conversations.get(groupId)
+  if (!group) {
+    throw new Error('Failed to get a group')
+  }
+  const addresses = findMemberAddresses(group, memberInboxId)
+  if (!addresses.length) {
+    throw new Error('Failed to get member addreseses')
+  }
+  const primaryMember = addresses[0]
+
+  redis.storeEvictionInfo(groupId, memberInboxId, {
+    messageFlagged: messageFlagged.content,
+    accountAddressOrEns: primaryMember,
+  })
+
+  await group.send(
+    `User is flagged for eviction from group: ${config.frameUrlRoot}/evict?groupId=${groupId}&memberId=${memberInboxId}`,
+    ContentTypeText
+  )
 }
 
 export async function handleMessage(
@@ -33,7 +65,7 @@ export async function handleMessage(
     console.log(
       `User ${message.senderInboxId} has a spam score of ${userScore}. Kicking them out of the group`
     )
-    evictMember(client, message.conversationId, message.senderInboxId)
+    await beginEviction(client, redis, message)
   }
 }
 

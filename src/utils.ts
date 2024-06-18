@@ -8,6 +8,8 @@ import {
 import { mainnet } from 'viem/chains'
 import config from './config.js'
 
+const CONVERSE_API_URL = 'https://backend-staging.converse.xyz/api'
+
 export function walletClientFromMnemonic(mnemonic: string): WalletClient {
   const account = mnemonicToAccount(mnemonic)
   return createWalletClient({
@@ -74,4 +76,19 @@ export function findMemberAddresses(
 ): string[] {
   const foundMember = group.members.find((member) => member.inboxId === inboxId)
   return foundMember?.accountAddresses ?? []
+}
+
+export async function getConverseProfile(
+  walletAddress: string
+): Promise<{ userNames: { name: string }[] }> {
+  const url = `${CONVERSE_API_URL}/profile?address=${walletAddress}`
+  const data = await (
+    await fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  ).json()
+
+  console.log(`Converse API response: ${data}`)
+
+  return data
 }

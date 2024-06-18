@@ -3,7 +3,7 @@ import type { Client, Conversation, DecodedMessage } from '@xmtp/mls-client'
 import config from './config.js'
 import type { RedisClient } from './redis.js'
 import { getSpamScore } from './spamScore.js'
-import { findMemberAddresses } from './utils.js'
+import { findMemberAddresses, getConverseProfile } from './utils.js'
 
 export async function evictMember(
   client: Client,
@@ -15,6 +15,18 @@ export async function evictMember(
     throw new Error('Group not found')
   }
   await group.removeMembersByInboxId([memberInboxId])
+}
+
+async function tryResolveAddress(address: string): Promise<string> {
+  try {
+    const profileData = await getConverseProfile(address)
+    if (profileData?.userNames?.length) {
+      return profileData.userNames[0].name
+    }
+  } catch (e) {
+    console.error(`Failed to resolve address ${address}`, e)
+  }
+  return address
 }
 
 export async function beginEviction(
@@ -37,7 +49,7 @@ export async function beginEviction(
 
   redis.storeEvictionInfo(groupId, memberInboxId, {
     messageFlagged: messageFlagged.content,
-    accountAddressOrEns: primaryMember,
+    accountAddressOrEns: await tryResolveAddress(primaryMember),
   })
 
   await group.send(

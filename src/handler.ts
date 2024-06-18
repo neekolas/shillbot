@@ -38,7 +38,8 @@ export async function beginEviction(
 ) {
   const groupId = messageFlagged.conversationId
   const memberInboxId = messageFlagged.senderInboxId
-
+  await client.conversations.sync()
+  await client.conversations.list()
   const group = client.conversations.get(groupId)
   if (!group) {
     throw new Error('Failed to get a group')
@@ -76,10 +77,10 @@ export async function handleMessage(
     messageScore.score
   )
 
-  console.log(`Message has a SPAM score of ${messageScore} giving the user an overall score of ${userScore}.
+  console.log(`Message has a SPAM score of ${messageScore.score} giving the user an overall score of ${userScore}.
   Message: ${message.content}`)
 
-  if (userScore < -10) {
+  if (userScore <= -8) {
     console.log(
       `User ${message.senderInboxId} has a spam score of ${userScore}. Kicking them out of the group`
     )

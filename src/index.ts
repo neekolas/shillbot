@@ -22,6 +22,7 @@ async function main() {
   })
 
   client.conversations.streamAllMessages((error, message) => {
+    console.log('Received message', message.id)
     if (error) {
       console.warn(`Stream error: ${error}`)
       return

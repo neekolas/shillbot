@@ -27,39 +27,39 @@ const getTextSpamScore = async (message: DecodedMessage) => {
     messages: [
       {
         content: prompt,
-        role: 'user',
+        role: 'system',
       },
       {
         content: trainingDataMessage1,
-        role: 'user',
+        role: 'system',
       },
       {
         content: trainingDataMessage2,
-        role: 'user',
+        role: 'system',
       },
       {
         content: trainingDataMessage3,
-        role: 'user',
+        role: 'system',
       },
       {
         content: trainingDataMessage4,
-        role: 'user',
+        role: 'system',
       },
       {
         content: trainingDataMessage5,
-        role: 'user',
+        role: 'system',
       },
       {
         content: trainingDataMessage6,
-        role: 'user',
+        role: 'system',
       },
       {
         content: trainingDataMessage7,
-        role: 'user',
+        role: 'system',
       },
       {
         content: mess,
-        role: 'system',
+        role: 'user',
       },
     ],
     // max_tokens: 150,

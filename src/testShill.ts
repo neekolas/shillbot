@@ -73,7 +73,7 @@ const prompts = [
   },
   {
     text: 'Learn about the environmental impact of cryptocurrency mining.',
-    score: 5,
+    score: 8,
   },
   {
     text: 'Get exclusive access to our new crypto trading platform. Sign up now!',

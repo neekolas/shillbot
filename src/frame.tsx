@@ -1,9 +1,11 @@
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { validateFramesPost } from '@xmtp/frames-validator'
+import type { Client } from '@xmtp/mls-client'
 import { Button, Frog } from 'frog'
 import { devtools } from 'frog/dev'
 import type { Context, Next } from 'hono'
+import { evictMember } from './handler.js'
 import type { RedisClient } from './redis.js'
 
 const addMetaTags = (client: string, version?: string) => {
@@ -17,6 +19,7 @@ const addMetaTags = (client: string, version?: string) => {
 }
 
 const xmtpSupport = async (c: Context, next: Next) => {
+  console.log('Request Method:', c.req.method) // Add this line to log the request method
   // Check if the request is a POST and relevant for XMTP processing
   if (c.req.method === 'POST') {
     const requestBody = (await c.req.json().catch(() => {})) || {}
@@ -35,7 +38,12 @@ const xmtpSupport = async (c: Context, next: Next) => {
   await next()
 }
 
-export async function createFrameServer(redis: RedisClient) {
+const choices = ['Evict', 'Keep']
+
+export async function createFrameServer(
+  redis: RedisClient,
+  xmtpClient: Client
+) {
   const app = new Frog(addMetaTags('xmtp'))
 
   app.use(xmtpSupport)
@@ -50,11 +58,30 @@ export async function createFrameServer(redis: RedisClient) {
       groupId as string,
       memberId as string
     )
-    const fruit = inputText || buttonValue
+    let isEvicted = false
+    if (typeof groupId === 'string' && typeof memberId && 'string') {
+      isEvicted = await redis.getIsEvicted(
+        groupId as string,
+        memberId as string
+      )
+    }
+    const memberDisplayName = evictionData.accountAddressOrEns
+    const groupName = 'Group Name'
+    const choice = inputText || buttonValue
 
     // XMTP verified address
     const { verifiedWalletAddress } = c?.var || {}
     console.log('verifiedWalletAddress', verifiedWalletAddress)
+
+    if (
+      status === 'response' &&
+      choice === 'Evict' &&
+      !isEvicted &&
+      typeof groupId === 'string' &&
+      typeof memberId === 'string'
+    ) {
+      evictMember(xmtpClient, groupId, memberId, redis)
+    }
 
     return c.res({
       image: (
@@ -87,16 +114,23 @@ export async function createFrameServer(redis: RedisClient) {
               whiteSpace: 'pre-wrap',
             }}
           >
-            {status === 'response'
-              ? `Nice choice.${fruit ? ` ${fruit.toUpperCase()}!!` : ''}`
-              : `Evicting ${memberId} from ${groupId}`}
+            {isEvicted &&
+              status !== 'response' &&
+              `User ${memberDisplayName} has been evicted from ${groupName}`}
+            {!isEvicted &&
+              status === 'response' &&
+              choice === 'Evict' &&
+              `You've choosen to evict ${memberDisplayName} from ${groupName}`}
+            {!isEvicted &&
+              status === 'response' &&
+              choice === 'Keep' &&
+              `You've choosen to keep ${memberDisplayName} from ${groupName}`}
+            {!isEvicted && status !== `Evict ${memberId} from ${groupId}?`}
           </div>
         </div>
       ),
       intents: [
-        <Button value="apples">Apples</Button>,
-        <Button value="oranges">Oranges</Button>,
-        <Button value="bananas">Bananas</Button>,
+        ...choices.map((choice) => <Button value={choice}>{choice}</Button>),
         status === 'response' && <Button.Reset>Reset</Button.Reset>,
       ],
     })

@@ -8,7 +8,7 @@ async function main() {
   const client = await buildClient(config.wallet)
   const redis = await buildRedis()
 
-  const _frame = await createFrameServer(redis)
+  const _frame = await createFrameServer(redis, client)
 
   console.log(`Listening to inbox: ${client.inboxId}`)
   await client.conversations.sync()

@@ -9,7 +9,8 @@
     "dev": "tsx watch ./src/index.ts",
     "start": "tsx ./src/index.ts",
     "spam": "tsx ./src/spammer.ts",
-    "test": "vitest ."
+    "test": "vitest .",
+    "test:shill": "tsx ./src/testShill.ts"
   },
   "author": "",
   "license": "MIT",
@@ -17,12 +18,14 @@
   "dependencies": {
     "@hono/node-server": "^1.11.3",
     "@types/redis": "^4.0.11",
+    "@xmtp/content-type-reply": "^1.1.11",
     "@xmtp/content-type-text": "^1.0.0",
     "@xmtp/frames-validator": "^0.6.1",
     "@xmtp/mls-client": "^0.0.10",
     "dotenv": "^16.4.5",
     "frog": "^0.11.9",
     "hono": "^4.4.6",
+    "openai": "^4.51.0",
     "redis": "^4.6.14",
     "ts-node": "^10.9.2",
     "tsx": "^4.15.6"

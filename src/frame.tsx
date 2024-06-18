@@ -136,8 +136,8 @@ export async function createFrameServer(
               choice === 'Keep' &&
               `You've choosen to keep ${memberDisplayName} from ${groupName}`}
             {!isEvicted &&
-              status === 'response' &&
-              `Evict ${memberId} from ${groupId}?`}
+              status === 'initial' &&
+              `Evict ${memberDisplayName} from ${groupName}?`}
           </div>
         </div>
       ),

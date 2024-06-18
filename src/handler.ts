@@ -51,15 +51,15 @@ export async function handleMessage(
   redis: RedisClient,
   message: DecodedMessage
 ) {
-  console.log(
-    `Handling message ${message.content} with id ${message.id}. Sender inbox: ${message.senderInboxId}`
-  )
   const messageScore = await getSpamScore(message)
   const userScore = await redis.incrementScore(
     message.conversationId,
     message.senderInboxId,
     messageScore.score
   )
+
+  console.log(`Message has a SPAM score of ${messageScore} giving the user an overall score of ${userScore}.
+  Message: ${message.content}`)
 
   if (userScore < -10) {
     console.log(

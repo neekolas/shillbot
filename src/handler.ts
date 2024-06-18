@@ -55,10 +55,11 @@ export async function beginEviction(
     accountAddressOrEns: await tryResolveAddress(primaryMember),
   })
 
-  await group.send(
-    `User is flagged for eviction from group: ${config.frameUrlRoot}/evict?groupId=${groupId}&memberId=${memberInboxId}`,
-    ContentTypeText
-  )
+  const evictionMessage = `User is flagged for eviction from group: ${config.frameUrlRoot}/evict?groupId=${groupId}&memberId=${memberInboxId}`
+
+  await group.send(evictionMessage, ContentTypeText)
+
+  console.log(`Sent eviction message to group. ${evictionMessage}`)
 }
 
 export async function handleMessage(

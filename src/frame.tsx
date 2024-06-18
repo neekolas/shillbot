@@ -50,10 +50,10 @@ export async function createFrameServer(
 
   app.use('/*', serveStatic({ root: './public' }))
 
-  app.frame('/evict', async (c) => {
-    const { buttonValue, inputText, status } = c
-    const groupId = c.req.query('groupId')
-    const memberId = c.req.query('memberId')
+  app.frame('/evict/:groupId/:memberId', async (c) => {
+    const { buttonValue, status } = c
+    const groupId = c.req.param('groupId')
+    const memberId = c.req.param('memberId')
     const evictionData = await redis.getEvictionInfo(
       groupId as string,
       memberId as string
@@ -66,11 +66,13 @@ export async function createFrameServer(
       )
     }
     const { accountAddressOrEns: memberDisplayName, groupName } = evictionData
-    const choice = inputText || buttonValue
+    const choice = buttonValue
 
     // XMTP verified address
     const { verifiedWalletAddress } = c?.var || {}
-    console.log('verifiedWalletAddress', verifiedWalletAddress)
+    console.log(
+      `Request from ${verifiedWalletAddress}. Choice: ${choice}. Status: ${status}`
+    )
 
     if (
       status === 'response' &&
@@ -82,10 +84,9 @@ export async function createFrameServer(
       evictMember(xmtpClient, groupId, memberId, redis)
     }
 
-    let intents = [
-      ...choices.map((choice) => <Button value={choice}>{choice}</Button>),
-      status === 'response' && <Button.Reset>Reset</Button.Reset>,
-    ]
+    let intents = choices.map((choice) => (
+      <Button value={choice}>{choice}</Button>
+    ))
 
     if (isEvicted) {
       intents = [<Button.Reset>Ok</Button.Reset>]

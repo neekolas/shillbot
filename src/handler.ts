@@ -56,7 +56,7 @@ export async function beginEviction(
     groupName: group.name || groupId,
   })
 
-  const evictionMessage = `User is flagged for eviction from group: ${config.frameUrlRoot}/evict?groupId=${groupId}&memberId=${memberInboxId}`
+  const evictionMessage = `User is flagged for eviction from group: ${config.frameUrlRoot}/evict/${groupId}/${memberInboxId}`
 
   await group.send(evictionMessage, ContentTypeText)
 

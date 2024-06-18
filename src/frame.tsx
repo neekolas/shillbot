@@ -35,17 +35,21 @@ const xmtpSupport = async (c: Context, next: Next) => {
   await next()
 }
 
-export async function createFrameServer(_redis: RedisClient) {
+export async function createFrameServer(redis: RedisClient) {
   const app = new Frog(addMetaTags('xmtp'))
 
   app.use(xmtpSupport)
 
   app.use('/*', serveStatic({ root: './public' }))
 
-  app.frame('/evict', (c) => {
+  app.frame('/evict', async (c) => {
     const { buttonValue, inputText, status } = c
     const groupId = c.req.query('groupId')
     const memberId = c.req.query('memberId')
+    const evictionData = await redis.getEvictionInfo(
+      groupId as string,
+      memberId as string
+    )
     const fruit = inputText || buttonValue
 
     // XMTP verified address

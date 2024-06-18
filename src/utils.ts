@@ -1,4 +1,4 @@
-import { Client } from '@xmtp/mls-client'
+import { Client, type Conversation } from '@xmtp/mls-client'
 import { createWalletClient, http, toBytes, type WalletClient } from 'viem'
 import {
   generatePrivateKey,
@@ -66,4 +66,12 @@ export function requireEnv(key: string): string {
 
 export function requireIntEnv(key: string): number {
   return parseInt(requireEnv(key))
+}
+
+export function findMemberAddresses(
+  group: Conversation,
+  inboxId: string
+): string[] {
+  const foundMember = group.members.find((member) => member.inboxId === inboxId)
+  return foundMember?.accountAddresses ?? []
 }

@@ -3,6 +3,8 @@
     "downlevelIteration": false,
     "esModuleInterop": true,
     "outDir": "./dist",
+    "jsx": "react-jsx",
+    "jsxImportSource": "frog/jsx",
     "forceConsistentCasingInFileNames": true,
     "module": "NodeNext",
     // "moduleResolution": "bundler",

@@ -1,4 +1,5 @@
 import config from './config.js'
+import { createFrameServer } from './frame.js'
 import { handleMessage, handleNewGroup } from './handler.js'
 import { buildRedis } from './redis.js'
 import { buildClient } from './utils.js'
@@ -6,6 +7,8 @@ import { buildClient } from './utils.js'
 async function main() {
   const client = await buildClient(config.wallet)
   const redis = await buildRedis()
+
+  const _frame = await createFrameServer(redis)
 
   console.log(`Listening to inbox: ${client.inboxId}`)
   await client.conversations.sync()

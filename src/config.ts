@@ -8,6 +8,7 @@ dotenv.config()
 
 export type Config = {
   dbFolder: string
+  frameUrlRoot: string
   wallet: WalletClient
   redisUrl: string
   xmtpEnv: XmtpEnv
@@ -28,6 +29,7 @@ const buildConfig = (): Config => {
   const mnemonic = requireEnv('WALLET_MNEMONIC')
 
   return {
+    frameUrlRoot: process.env.FRAME_URL_ROOT || 'http://localhost:3000',
     xmtpEnv: getXmtpEnv(),
     dbFolder: process.env.DB_FOLDER || os.tmpdir(),
     wallet: walletClientFromMnemonic(mnemonic),

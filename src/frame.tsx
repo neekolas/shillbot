@@ -42,8 +42,10 @@ export async function createFrameServer(_redis: RedisClient) {
 
   app.use('/*', serveStatic({ root: './public' }))
 
-  app.frame('/', (c) => {
+  app.frame('/evict', (c) => {
     const { buttonValue, inputText, status } = c
+    const groupId = c.req.query('groupId')
+    const memberId = c.req.query('memberId')
     const fruit = inputText || buttonValue
 
     // XMTP verified address
@@ -83,7 +85,7 @@ export async function createFrameServer(_redis: RedisClient) {
           >
             {status === 'response'
               ? `Nice choice.${fruit ? ` ${fruit.toUpperCase()}!!` : ''}`
-              : 'Welcome!'}
+              : `Evicting ${memberId} from ${groupId}`}
           </div>
         </div>
       ),

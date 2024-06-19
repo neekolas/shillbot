@@ -47,7 +47,9 @@ export async function beginEviction(
   }
   const addresses = findMemberAddresses(group, memberInboxId)
   if (!addresses.length) {
-    throw new Error('Failed to get member addreseses')
+    throw new Error(
+      `Failed to get member addreseses for inbox ${memberInboxId}. Group members. ${group.members}`
+    )
   }
   const primaryMember = addresses[0]
 
